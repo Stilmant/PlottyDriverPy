@@ -455,7 +455,19 @@ def step_down( steps, step_sleep ):
         time.sleep( step_sleep )
         #pigpio.gpioDelay( step_sleep )
         if not calibration_ongoing and (limit_switch_top_on() or limit_switch_bottom_on() or limit_switch_left_on() or limit_switch_right_on()):
-            print("error: limit switch on")
+            limit_switches_on = []
+            if limit_switch_top_on():
+                limit_switches_on.append("top")
+            if limit_switch_bottom_on():
+                limit_switches_on.append("bottom")
+            if limit_switch_left_on():
+                limit_switches_on.append("left")
+            if limit_switch_right_on():
+                limit_switches_on.append("right")
+    
+            limit_switches_on_str = ", ".join(limit_switches_on)
+    
+            print(f"step_down error: limit switch on ({limit_switches_on_str})")
             print("x_steps_skew:" + str(x_steps_skew) + ", y_steps_skew:" + str(y_steps_skew))
             exit( 0 )
 
@@ -473,7 +485,19 @@ def step_up( steps, step_sleep ):
         time.sleep( step_sleep )
         #pigpio.gpioDelay( step_sleep )
         if not calibration_ongoing and (limit_switch_top_on() or limit_switch_bottom_on() or limit_switch_left_on() or limit_switch_right_on()):
-            print("error: limit switch on")
+            limit_switches_on = []
+            if limit_switch_top_on():
+                limit_switches_on.append("top")
+            if limit_switch_bottom_on():
+                limit_switches_on.append("bottom")
+            if limit_switch_left_on():
+                limit_switches_on.append("left")
+            if limit_switch_right_on():
+                limit_switches_on.append("right")
+    
+            limit_switches_on_str = ", ".join(limit_switches_on)
+    
+            print(f"step_up error: limit switch on ({limit_switches_on_str})")
             print("x_steps_skew:" + str(x_steps_skew) + ", y_steps_skew:" + str(y_steps_skew))
             exit( 0 )
 
@@ -491,7 +515,20 @@ def step_right( steps, step_sleep ):
         time.sleep( step_sleep )
         #pigpio.gpioDelay( step_sleep )
         if not calibration_ongoing and (limit_switch_top_on() or limit_switch_bottom_on() or limit_switch_left_on() or limit_switch_right_on()):
-            print("error: limit switch on")
+            limit_switches_on = []
+            if limit_switch_top_on():
+                limit_switches_on.append("top")
+            if limit_switch_bottom_on():
+                limit_switches_on.append("bottom")
+            if limit_switch_left_on():
+                limit_switches_on.append("left")
+            if limit_switch_right_on():
+                limit_switches_on.append("right")
+    
+            limit_switches_on_str = ", ".join(limit_switches_on)
+    
+            print(f"step_right error: limit switch on ({limit_switches_on_str})")
+
             print("x_steps_skew:" + str(x_steps_skew) + ", y_steps_skew:" + str(y_steps_skew))
             exit( 0 )
 
@@ -509,7 +546,20 @@ def step_left( steps, step_sleep ):
         time.sleep( step_sleep )
         #pigpio.gpioDelay( step_sleep )
         if not calibration_ongoing and (limit_switch_top_on() or limit_switch_bottom_on() or limit_switch_left_on() or limit_switch_right_on()):
-            print("error: limit switch on")
+            limit_switches_on = []
+            if limit_switch_top_on():
+                limit_switches_on.append("top")
+            if limit_switch_bottom_on():
+                limit_switches_on.append("bottom")
+            if limit_switch_left_on():
+                limit_switches_on.append("left")
+            if limit_switch_right_on():
+                limit_switches_on.append("right")
+    
+            limit_switches_on_str = ", ".join(limit_switches_on)
+    
+            print(f"step_left error: limit switch on ({limit_switches_on_str})")
+
             print("x_steps_skew:" + str(x_steps_skew) + ", y_steps_skew:" + str(y_steps_skew))
             exit( 0 )
 
