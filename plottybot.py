@@ -441,20 +441,36 @@ def test_top_stepper():
     set_step_size( saved_step_size )
     command_running = False
 
+def step_motor(steps, step_sleep, direction):
 
-def step_down( steps, step_sleep ):
-    GPIO.output( stepper_bottom_dir, GPIO.HIGH )
-    GPIO.output( stepper_top_dir, GPIO.HIGH )
-    for i in range( steps ):
-        GPIO.output( stepper_bottom_step, GPIO.HIGH )
-        GPIO.output( stepper_top_step, GPIO.HIGH )
-        time.sleep( step_sleep )
-        #pigpio.gpioDelay( step_sleep )
-        GPIO.output( stepper_bottom_step, GPIO.LOW )
-        GPIO.output( stepper_top_step, GPIO.LOW )
-        time.sleep( step_sleep )
-        #pigpio.gpioDelay( step_sleep )
-        if not calibration_ongoing and (limit_switch_top_on() or limit_switch_bottom_on() or limit_switch_left_on() or limit_switch_right_on()):
+    if direction == 'down':
+        bottom_dir = GPIO.HIGH
+        top_dir = GPIO.HIGH
+    elif direction == 'up':
+        bottom_dir = GPIO.LOW
+        top_dir = GPIO.LOW
+    elif direction == 'left':
+        bottom_dir = GPIO.HIGH
+        top_dir = GPIO.LOW
+    elif direction == 'right':
+        bottom_dir = GPIO.LOW
+        top_dir = GPIO.HIGH
+
+    GPIO.output(stepper_bottom_dir, bottom_dir)
+    GPIO.output(stepper_top_dir, top_dir)
+    for i in range(steps):
+        GPIO.output(stepper_bottom_step, GPIO.HIGH)
+        GPIO.output(stepper_top_step, GPIO.HIGH)
+        time.sleep(step_sleep)
+        GPIO.output(stepper_bottom_step, GPIO.LOW)
+        GPIO.output(stepper_top_step, GPIO.LOW)
+        time.sleep(step_sleep)
+        if not calibration_ongoing and (
+            limit_switch_top_on() or
+            limit_switch_bottom_on() or
+            limit_switch_left_on() or
+            limit_switch_right_on()
+        ):
             limit_switches_on = []
             if limit_switch_top_on():
                 limit_switches_on.append("top")
@@ -464,125 +480,47 @@ def step_down( steps, step_sleep ):
                 limit_switches_on.append("left")
             if limit_switch_right_on():
                 limit_switches_on.append("right")
-    
+
             limit_switches_on_str = ", ".join(limit_switches_on)
-    
-            print(f"step_down error: limit switch on ({limit_switches_on_str})")
+            print(f"step error: limit switch on ({limit_switches_on_str}) while moving {direction}")
             print("x_steps_skew:" + str(x_steps_skew) + ", y_steps_skew:" + str(y_steps_skew))
-            exit( 0 )
+            exit(0)
 
+def step_down(steps, step_sleep):
+    step_motor(steps, step_sleep, 'down')
 
-def step_up( steps, step_sleep ):
-    GPIO.output( stepper_bottom_dir, GPIO.LOW )
-    GPIO.output( stepper_top_dir, GPIO.LOW )
-    for i in range( steps ):
-        GPIO.output( stepper_bottom_step, GPIO.HIGH )
-        GPIO.output( stepper_top_step, GPIO.HIGH )
-        time.sleep( step_sleep )
-        #pigpio.gpioDelay( step_sleep )
-        GPIO.output( stepper_bottom_step, GPIO.LOW )
-        GPIO.output( stepper_top_step, GPIO.LOW )
-        time.sleep( step_sleep )
-        #pigpio.gpioDelay( step_sleep )
-        if not calibration_ongoing and (limit_switch_top_on() or limit_switch_bottom_on() or limit_switch_left_on() or limit_switch_right_on()):
-            limit_switches_on = []
-            if limit_switch_top_on():
-                limit_switches_on.append("top")
-            if limit_switch_bottom_on():
-                limit_switches_on.append("bottom")
-            if limit_switch_left_on():
-                limit_switches_on.append("left")
-            if limit_switch_right_on():
-                limit_switches_on.append("right")
-    
-            limit_switches_on_str = ", ".join(limit_switches_on)
-    
-            print(f"step_up error: limit switch on ({limit_switches_on_str})")
-            print("x_steps_skew:" + str(x_steps_skew) + ", y_steps_skew:" + str(y_steps_skew))
-            exit( 0 )
+def step_up(steps, step_sleep):
+    step_motor(steps, step_sleep, 'up')
 
+def step_right(steps, step_sleep):
+    step_motor(steps, step_sleep, 'right')
 
-def step_right( steps, step_sleep ):
-    GPIO.output( stepper_bottom_dir, GPIO.LOW )
-    GPIO.output( stepper_top_dir, GPIO.HIGH )
-    for i in range( steps ):
-        GPIO.output( stepper_bottom_step, GPIO.HIGH )
-        GPIO.output( stepper_top_step, GPIO.HIGH )
-        time.sleep( step_sleep )
-        #pigpio.gpioDelay( step_sleep )
-        GPIO.output( stepper_bottom_step, GPIO.LOW )
-        GPIO.output( stepper_top_step, GPIO.LOW )
-        time.sleep( step_sleep )
-        #pigpio.gpioDelay( step_sleep )
-        if not calibration_ongoing and (limit_switch_top_on() or limit_switch_bottom_on() or limit_switch_left_on() or limit_switch_right_on()):
-            limit_switches_on = []
-            if limit_switch_top_on():
-                limit_switches_on.append("top")
-            if limit_switch_bottom_on():
-                limit_switches_on.append("bottom")
-            if limit_switch_left_on():
-                limit_switches_on.append("left")
-            if limit_switch_right_on():
-                limit_switches_on.append("right")
-    
-            limit_switches_on_str = ", ".join(limit_switches_on)
-    
-            print(f"step_right error: limit switch on ({limit_switches_on_str})")
-
-            print("x_steps_skew:" + str(x_steps_skew) + ", y_steps_skew:" + str(y_steps_skew))
-            exit( 0 )
-
-
-def step_left( steps, step_sleep ):
-    GPIO.output( stepper_bottom_dir, GPIO.HIGH )
-    GPIO.output( stepper_top_dir, GPIO.LOW )
-    for i in range( steps ):
-        GPIO.output( stepper_bottom_step, GPIO.HIGH )
-        GPIO.output( stepper_top_step, GPIO.HIGH )
-        time.sleep( step_sleep )
-        #pigpio.gpioDelay( step_sleep )
-        GPIO.output( stepper_bottom_step, GPIO.LOW )
-        GPIO.output( stepper_top_step, GPIO.LOW )
-        time.sleep( step_sleep )
-        #pigpio.gpioDelay( step_sleep )
-        if not calibration_ongoing and (limit_switch_top_on() or limit_switch_bottom_on() or limit_switch_left_on() or limit_switch_right_on()):
-            limit_switches_on = []
-            if limit_switch_top_on():
-                limit_switches_on.append("top")
-            if limit_switch_bottom_on():
-                limit_switches_on.append("bottom")
-            if limit_switch_left_on():
-                limit_switches_on.append("left")
-            if limit_switch_right_on():
-                limit_switches_on.append("right")
-    
-            limit_switches_on_str = ", ".join(limit_switches_on)
-    
-            print(f"step_left error: limit switch on ({limit_switches_on_str})")
-
-            print("x_steps_skew:" + str(x_steps_skew) + ", y_steps_skew:" + str(y_steps_skew))
-            exit( 0 )
-
+def step_left(steps, step_sleep):
+    step_motor(steps, step_sleep, 'left')
 
 def limit_switch_top_on():
+    return False
     if GPIO.input( limit_switch_top )==0:
         return True
     return False
 
 
 def limit_switch_bottom_on():
+    return False
     if GPIO.input( limit_switch_bottom )==0:
         return True
     return False
 
 
 def limit_switch_left_on():
+    return False
     if GPIO.input( limit_switch_left )==0:
         return True
     return False
 
 
 def limit_switch_right_on():
+    return False
     if GPIO.input( limit_switch_right )==0:
         return True
     return False
@@ -935,7 +873,7 @@ def calibrate_manually():
     global calibrate_manually_down_reached, calibrate_manually_up_reached, calibrate_manually_left_reached, calibrate_manually_right_reached
 
     command_running = True
-    print("> calibrate_manually")
+    print("> calibrate_manually (michael Version 1.0)")
 
     calibration_done = False
     calibrate_manually_down_reached = False
