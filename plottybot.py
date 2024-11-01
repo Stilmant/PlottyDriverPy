@@ -1061,18 +1061,86 @@ def calibrate_manually():
     else:
         canvas_max_x = 100.0
         canvas_max_y = 100.0
-    print("> calibration finished, canvas area: " + str(canvas_max_x) + "x" + str(canvas_max_y))
 
     # all righty it's right in the middle now and we know it
     current_x = canvas_max_x/2
     current_y = canvas_max_y/2
 
-    print(">   head currently at " + str(current_x) + "," + str(current_y))
+    # Now that the calibration is finshed, we need to reset the skew (skew is used to keep track of the steps that are not taken)
+    global x_steps_skew, y_steps_skew
+    x_steps_skew = 0
+    y_steps_skew = 0
 
+    # setting the calibration done flag
     calibration_ongoing = False
     calibration_done = True
     command_running = False
 
+    #print all the calibration data
+    print("> calibration finished, canvas area: " + str(canvas_max_x) + "x" + str(canvas_max_y))
+    print(">   canvas area in steps: " + str(canvas_max_x_steps) + "x" + str(canvas_max_y_steps))
+    print(">   head currently at " + str(current_x) + "," + str(current_y))
+    print(">   also x_steps_skew:" + str(x_steps_skew) + ", y_steps_skew:" + str(y_steps_skew))
+    print(">   all done, ready to draw")
+
+    #now that the calibration is done, we need to save the calibration data to disk
+    save_calibration_to_disk()
+
+def save_calibration_to_disk():
+    global canvas_max_x_steps, canvas_max_y_steps, canvas_max_x, canvas_max_y, current_x, current_y
+
+    print( "> save_calibration_to_disk" )
+    # some variables are preserved accross reboots
+    calibration_data = {}
+    calibration_data['canvas_max_x_steps'] = canvas_max_x_steps
+    calibration_data['canvas_max_y_steps'] = canvas_max_y_steps
+    calibration_data['canvas_max_x'] = canvas_max_x
+    calibration_data['canvas_max_y'] = canvas_max_y
+    # current_x and current_y are not saved since head position is not preserved accross reboots
+    # when user load the calibration he need to place the head at position 0,0
+    try:
+        f = open( "/root/calibration.json", "w" )
+        f.write( json.dumps(calibration_data) )
+        f.close()
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        pass
+
+# load the calibration data from disk
+# this is used to preserve the calibration data accross reboots
+# However the head position is not preserved, so the user need to place the head at 0,0 when loading the calibration
+def load_calibration_from_disk():
+    global canvas_max_x_steps, canvas_max_y_steps, canvas_max_x, canvas_max_y, current_x, current_y, calibration_ongoing, calibration_done
+
+    print( "> load_calibration_from_disk" )
+    # some variables are preserved accross reboots
+    try:
+        f = open( "/root/calibration.json", "r" )
+        calibration_data = f.read()
+        f.close
+
+        calibration_data = json.loads( calibration_data )
+
+        canvas_max_x_steps = calibration_data['canvas_max_x_steps']
+        canvas_max_y_steps = calibration_data['canvas_max_y_steps']
+        canvas_max_x = calibration_data['canvas_max_x']
+        canvas_max_y = calibration_data['canvas_max_y']
+        current_x = 0
+        current_y = 0
+
+        # update calibration status variables
+
+        calibration_ongoing = False
+        calibration_done = True
+
+        print("> calibration data loaded from disk")
+        print(">   canvas area: " + str(canvas_max_x) + "x" + str(canvas_max_y))
+        print(">   canvas area in steps: " + str(canvas_max_x_steps) + "x" + str(canvas_max_y_steps))
+        print(">   head currently at " + str(current_x) + "," + str(current_y))
+
+    except:
+        # I guess we'll just keep the defaults
+        print( "no calibration data on disk, must be a first run" )
 
 def calibrate_automatic():
     global canvas_max_x_steps, canvas_max_y_steps, canvas_max_x, canvas_max_y, current_x, current_y, calibration_ongoing, calibration_done, command_running
@@ -1389,6 +1457,10 @@ def command_server():
                 calibrate_manually_right_reached = True
                 while not calibration_done:
                     time.sleep( 0.1 )
+                command_server_client.sendall( b"ok" )
+                command_server_client.close()
+            elif buf=="load_calibration":
+                load_calibration_from_disk()
                 command_server_client.sendall( b"ok" )
                 command_server_client.close()
             elif buf=="disconnect_from_mg_session":
