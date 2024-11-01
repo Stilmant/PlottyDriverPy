@@ -1459,7 +1459,7 @@ def command_server():
                     time.sleep( 0.1 )
                 command_server_client.sendall( b"ok" )
                 command_server_client.close()
-            elif buf=="load_calibration":
+            elif buf=="calibrate_origin_fixate":
                 load_calibration_from_disk()
                 command_server_client.sendall( b"ok" )
                 command_server_client.close()
