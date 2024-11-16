@@ -1459,6 +1459,26 @@ def command_server():
                     time.sleep( 0.1 )
                 command_server_client.sendall( b"ok" )
                 command_server_client.close()
+            elif buf=="calibrate_origin_step_down":
+                print( "# calibrate_origin_step_down" )
+                step_down( 100, default_step_sleep )
+                command_server_client.sendall( b"ok" )
+                command_server_client.close()
+            elif buf=="calibrate_origin_step_up":
+                print( "# calibrate_origin_step_up" )
+                step_up( 100, default_step_sleep )
+                command_server_client.sendall( b"ok" )
+                command_server_client.close()
+            elif buf=="calibrate_origin_step_left":
+                print( "# calibrate_origin_step_left" )
+                step_left( 100, default_step_sleep )
+                command_server_client.sendall( b"ok" )
+                command_server_client.close()
+            elif buf=="calibrate_origin_step_right":
+                print( "# calibrate_origin_step_right" )
+                step_right( 100, default_step_sleep )
+                command_server_client.sendall( b"ok" )
+                command_server_client.close()
             elif buf=="calibrate_origin_fixate":
                 load_calibration_from_disk()
                 command_server_client.sendall( b"ok" )
